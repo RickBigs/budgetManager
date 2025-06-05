@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aggiungi Spesa</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aggiungi una spesa al tuo bilancio familiare.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Aggiungi una Spesa</h1>
+    <form id="expenseForm">
+        <label>Categoria:</label>
+        <select name="category" required>
+            <option value="Alimentari">Alimentari</option>
+            <option value="Bollette">Bollette</option>
+            <option value="Svago">Svago</option>
+            <option value="Trasporti">Trasporti</option>
+            <option value="Altro">Altro</option>
+        </select>
+
+        <label>Importo (€):</label>
+        <input type="number" name="amount" step="0.01" required>
+
+        <label>Descrizione:</label>
+        <input type="text" name="description" required>
+
+        <label>Data spesa:</label>
+        <input type="date" name="expense_date" required>
+
+        <button type="submit">Salva Spesa</button>
+    </form>
+
+    <a href="index.html">⬅ Torna alla Dashboard</a>
+
+    <script>
+        document.getElementById('expenseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            fetch('api/expenses.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (response.status === 'ok') {
+                    alert('Spesa salvata!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Errore nel salvataggio.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

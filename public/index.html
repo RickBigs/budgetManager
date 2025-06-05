@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bilancio Familiare</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard per la gestione del bilancio familiare.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Bilancio Familiare</h1>
+    <h2>Totale mese: <span id="total"></span> €</h2>
+    <label for="monthFilter">Filtra per mese:</label>
+    <input type="month" id="monthFilter" name="monthFilter">
+    <div id="loader" style="display:none;">Caricamento...</div>
+    <div id="errorMsg" style="color:red;"></div>
+    <table id="expensesTable">
+        <thead>
+            <tr>
+            <th>Data</th>
+            <th>Categoria</th>
+            <th>Descrizione</th>
+            <th>Importo</th>
+            <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <canvas id="categoryChart" width="180" height="180"></canvas>
+    <a href="add-expense.html">➕ Aggiungi spesa</a>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
