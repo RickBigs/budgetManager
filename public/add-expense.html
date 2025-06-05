@@ -1,59 +1,133 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Aggiungi Spesa</title>
+    <title>Aggiungi Spesa - Bilancio Familiare</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Aggiungi una spesa al tuo bilancio familiare.">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Aggiungi una Spesa</h1>
-    <form id="expenseForm">
-        <label>Categoria:</label>
-        <select name="category" required>
-            <option value="Alimentari">Alimentari</option>
-            <option value="Bollette">Bollette</option>
-            <option value="Svago">Svago</option>
-            <option value="Trasporti">Trasporti</option>
-            <option value="Altro">Altro</option>
-        </select>
+    <div class="container">
+        <h1>➕ Aggiungi una Spesa</h1>
+        
+        <form id="expenseForm">
+            <label for="category">Categoria:</label>
+            <select id="category" name="category" required>
+                <option value="">Seleziona una categoria...</option>
+                <option value="Alimentari">🛒 Alimentari</option>
+                <option value="Bollette">📄 Bollette</option>
+                <option value="Svago">🎮 Svago</option>
+                <option value="Trasporti">🚗 Trasporti</option>
+                <option value="Altro">📦 Altro</option>
+            </select>
 
-        <label>Importo (€):</label>
-        <input type="number" name="amount" step="0.01" required>
+            <label for="amount">Importo (€):</label>
+            <input type="number" id="amount" name="amount" step="0.01" min="0.01" required placeholder="0.00">
 
-        <label>Descrizione:</label>
-        <input type="text" name="description" required>
+            <label for="description">Descrizione:</label>
+            <input type="text" id="description" name="description" required placeholder="Inserisci una descrizione..." maxlength="255">
 
-        <label>Data spesa:</label>
-        <input type="date" name="expense_date" required>
+            <label for="expense_date">Data spesa:</label>
+            <input type="date" id="expense_date" name="expense_date" required>
 
-        <button type="submit">Salva Spesa</button>
-    </form>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">💾 Salva Spesa</button>
+                <a href="index.html" class="btn btn-secondary">Annulla</a>
+            </div>
+        </form>
 
-    <a href="index.html">⬅ Torna alla Dashboard</a>
+        <div id="loader" class="loader" style="display:none;">
+            <div class="spinner"></div>
+            <p>Salvataggio in corso...</p>
+        </div>
+        
+        <div id="errorMsg" class="error-message"></div>
+    </div>
 
     <script>
+        // Imposta la data di oggi come default
+        document.getElementById('expense_date').valueAsDate = new Date();
+        
+        // Funzione per mostrare/nascondere il loader
+        function showLoader(show) {
+            document.getElementById('loader').style.display = show ? 'block' : 'none';
+        }
+        
+        // Funzione per mostrare messaggi di errore
+        function showError(msg) {
+            const errorEl = document.getElementById('errorMsg');
+            errorEl.textContent = msg || '';
+            if (msg) {
+                setTimeout(() => {
+                    errorEl.textContent = '';
+                }, 5000);
+            }
+        }
+        
+        // Gestione submit del form
         document.getElementById('expenseForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            showLoader(true);
+            showError('');
+            
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
-
+            
+            // Validazione lato client
+            if (!data.category || !data.amount || !data.description || !data.expense_date) {
+                showError('Per favore compila tutti i campi.');
+                showLoader(false);
+                return;
+            }
+            
+            if (parseFloat(data.amount) <= 0) {
+                showError('L\'importo deve essere maggiore di zero.');
+                showLoader(false);
+                return;
+            }
+            
+            // Invia i dati al server
             fetch('api/expenses.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('Errore nel server');
+                return res.json();
+            })
             .then(response => {
                 if (response.status === 'ok') {
-                    alert('Spesa salvata!');
-                    window.location.href = 'index.html';
+                    // Mostra messaggio di successo
+                    const successMsg = document.createElement('div');
+                    successMsg.className = 'success-message';
+                    successMsg.textContent = '✅ Spesa salvata con successo!';
+                    successMsg.style.cssText = 'background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;';
+                    document.querySelector('.container').insertBefore(successMsg, document.getElementById('expenseForm'));
+                    
+                    // Reset del form
+                    this.reset();
+                    document.getElementById('expense_date').valueAsDate = new Date();
+                    
+                    // Redirect dopo 2 secondi
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
                 } else {
-                    alert('Errore nel salvataggio.');
+                    showError(response.message || 'Errore nel salvataggio.');
                 }
-            });
+            })
+            .catch(err => {
+                console.error('Errore:', err);
+                showError('Errore di rete. Riprova più tardi.');
+            })
+            .finally(() => showLoader(false));
         });
+        
+        // Focus sul primo campo
+        document.getElementById('category').focus();
     </script>
 </body>
 </html>

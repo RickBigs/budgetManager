@@ -8,26 +8,62 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Bilancio Familiare</h1>
-    <h2>Totale mese: <span id="total"></span> €</h2>
-    <label for="monthFilter">Filtra per mese:</label>
-    <input type="month" id="monthFilter" name="monthFilter">
-    <div id="loader" style="display:none;">Caricamento...</div>
-    <div id="errorMsg" style="color:red;"></div>
-    <table id="expensesTable">
-        <thead>
-            <tr>
-            <th>Data</th>
-            <th>Categoria</th>
-            <th>Descrizione</th>
-            <th>Importo</th>
-            <th>Azioni</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <canvas id="categoryChart" width="180" height="180"></canvas>
-    <a href="add-expense.html">➕ Aggiungi spesa</a>
+    <div class="container">
+        <h1>💰 Bilancio Familiare</h1>
+        
+        <div class="summary-card">
+            <h2>Totale spese: <span id="total" class="amount">0.00</span> €</h2>
+            <div class="filter-container">
+                <label for="monthFilter">Filtra per mese:</label>
+                <input type="month" id="monthFilter" name="monthFilter">
+                <button onclick="resetFilter()" class="btn-secondary">Mostra tutto</button>
+            </div>
+        </div>
+
+        <div id="loader" class="loader" style="display:none;">
+            <div class="spinner"></div>
+            <p>Caricamento...</p>
+        </div>
+        
+        <div id="errorMsg" class="error-message"></div>
+        
+        <div class="content-grid">
+            <div class="expenses-section">
+                <h3>📋 Elenco Spese</h3>
+                <div class="table-container">
+                    <table id="expensesTable">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Categoria</th>
+                                <th>Descrizione</th>
+                                <th>Importo</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="empty-state">Nessuna spesa registrata</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h3>📊 Riepilogo per Categoria</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                    <div id="noDataMessage" class="no-data">Nessun dato da visualizzare</div>
+                </div>
+                <div id="categoryLegend" class="category-legend"></div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="add-expense.html" class="btn btn-primary">➕ Aggiungi spesa</a>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
